@@ -17,7 +17,7 @@ if GetDepend('RT_USING_W25QXX'):
 if GetDepend('RT_USING_W25QXX_MTD'):
     src_device += ['spi_flash_w25qxx_mtd.c']    
     
-if GetDepend('RT_USING_ENC28J60'):
+if GetDepend('RT_USING_ENC28J60') and GetDepend('RT_USING_LWIP'):
     src_device += ['enc28j60.c']
 
 if GetDepend('RT_USING_AT45DBXX'):

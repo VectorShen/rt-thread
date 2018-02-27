@@ -49,7 +49,11 @@ extern "C" {
 /**
  * @addtogroup BasicDef
  */
-
+#ifndef __cplusplus
+  #define bool    _Bool
+  #define true    1
+  #define false   0
+#endif
 /*@{*/
 
 /* RT-Thread version information */

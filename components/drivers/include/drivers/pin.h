@@ -33,6 +33,8 @@
 extern "C" {
 #endif
 
+typedef void (*rt_pin_attach_irq_fun)(void *param);
+
 /* pin device and operations for RT-Thread */
 struct rt_device_pin
 {

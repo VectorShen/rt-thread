@@ -1,6 +1,7 @@
 #include "enc28j60.h"
+#include <drivers/pin.h>
 
-#define NET_TRACE
+//#define NET_TRACE
 #define ETH_RX_DUMP
 #define ETH_TX_DUMP
 
@@ -737,6 +738,30 @@ static struct pbuf *enc28j60_rx(rt_device_t dev)
     enc28j60_unlock(dev);
 
     return p;
+}
+
+void enc28j60_attach_pins(rt_int32_t power_pin, \
+  	rt_int32_t rst_pin, rt_int32_t irq_pin)
+{
+#ifndef RT_USING_PIN
+#error	"must define RT_USING_PIN"
+#endif
+
+	enc28j60_dev.power_pin = power_pin;
+	enc28j60_dev.rst_pin = rst_pin;
+	enc28j60_dev.irq_pin = irq_pin;
+
+	/* pins setup */
+	rt_pin_mode(enc28j60_dev.power_pin, PIN_MODE_OUTPUT_OD/*PIN_MODE_OUTPUT*/);
+	rt_pin_mode(enc28j60_dev.rst_pin, PIN_MODE_OUTPUT);
+	rt_pin_mode(enc28j60_dev.irq_pin, PIN_MODE_INPUT_PULLUP);
+	rt_pin_attach_irq(enc28j60_dev.irq_pin, \
+		PIN_IRQ_MODE_FALLING,(rt_pin_attach_irq_fun)enc28j60_isr,RT_NULL);
+	rt_pin_irq_enable(enc28j60_dev.irq_pin, PIN_IRQ_ENABLE);
+
+	/* hardware power up */
+	rt_pin_write(enc28j60_dev.power_pin, PIN_HIGH);
+	rt_pin_write(enc28j60_dev.rst_pin, PIN_HIGH);
 }
 
 rt_err_t enc28j60_attach(const char * spi_device_name)

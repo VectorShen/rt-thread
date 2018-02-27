@@ -36,6 +36,7 @@
 #include <rtgui/calibration.h>
 #endif
 
+#if 0
 #include "led.h"
 
 ALIGN(RT_ALIGN_SIZE)
@@ -65,6 +66,7 @@ static void led_thread_entry(void* parameter)
         rt_thread_delay( RT_TICK_PER_SECOND/2 );
     }
 }
+#endif
 
 #ifdef RT_USING_RTGUI
 rt_bool_t cali_setup(void)
@@ -83,8 +85,16 @@ void cali_store(struct calibration_data *data)
 }
 #endif /* RT_USING_RTGUI */
 
+#ifdef RT_USING_PLATFORM_INIT
+extern void rt_platform_init(void);
+#endif /* RT_USING_PLATFORM_INIT */
+
 void rt_init_thread_entry(void* parameter)
 {
+#ifdef RT_USING_PLATFORM_INIT
+    rt_platform_init();
+#endif
+
 #ifdef RT_USING_COMPONENTS_INIT
     /* initialization RT-Thread Components */
     rt_components_init();
@@ -135,7 +145,7 @@ void rt_init_thread_entry(void* parameter)
 int rt_application_init(void)
 {
     rt_thread_t init_thread;
-
+#if 0
     rt_err_t result;
 
     /* init led thread */
@@ -151,6 +161,7 @@ int rt_application_init(void)
     {
         rt_thread_startup(&led_thread);
     }
+#endif
 
 #if (RT_THREAD_PRIORITY_MAX == 32)
     init_thread = rt_thread_create("init",

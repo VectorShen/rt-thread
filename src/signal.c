@@ -29,9 +29,13 @@
 #include <rtthread.h>
 
 #ifdef RT_USING_SIGNALS
-
+#include <libc/libc_signal.h>
 #ifndef RT_SIG_INFO_MAX
 #define RT_SIG_INFO_MAX 32
+
+#define SIG_DFL (0)  /* Default action */
+#define SIG_IGN (1)  /* Ignore action */
+#define SIG_ERR (-1) /* Error return */
 #endif
 
 // #define DBG_ENABLE

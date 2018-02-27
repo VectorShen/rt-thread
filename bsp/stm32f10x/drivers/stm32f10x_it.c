@@ -119,7 +119,7 @@ void DebugMon_Handler(void)
 /*  available peripheral interrupt handler's name please refer to the startup */
 /*  file (startup_stm32f10x_xx.s).                                            */
 /******************************************************************************/
-
+#if 0
 #ifdef  RT_USING_LWIP
 /*******************************************************************************
 * Function Name  : EXTI4_IRQHandler
@@ -144,6 +144,7 @@ void EXTI4_IRQHandler(void)
     rt_interrupt_leave();
 }
 #endif /* RT_USING_LWIP */
+#endif
 
 #ifndef STM32F10X_CL
 /* CAN and USB IRQ for stm32 none connectivity line devices

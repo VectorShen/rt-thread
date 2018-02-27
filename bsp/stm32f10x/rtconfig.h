@@ -59,6 +59,12 @@
 // <bool name="RT_USING_COMPONENTS_INIT" description="Using RT-Thread components initialization" default="true" />
 #define RT_USING_COMPONENTS_INIT
 
+#define RT_USING_PLATFORM_INIT
+
+#define RT_USING_POSIX
+#define RT_USING_LIBC
+#define RT_USING_SIGNALS
+
 /* SECTION: Device System */
 /* Using Device System */
 #define RT_USING_DEVICE
@@ -76,39 +82,69 @@
 
 /* SECTION: finsh, a C-Express shell */
 #define RT_USING_FINSH
+#ifdef RT_USING_FINSH
 /* Using symbol table */
 #define FINSH_USING_SYMTAB
 #define FINSH_USING_DESCRIPTION
+/* Using msh style */
+#define FINSH_USING_MSH
+#ifdef FINSH_USING_MSH
+#define FINSH_USING_MSH_ONLY
+#define FINSH_USING_MSH_DEFAULT
+#endif /* FINSH_USING_MSH */
+#endif /* RT_USING_FINSH */
 
 #define RT_USING_PIN
 
-#define RT_USING_CAN
+#define RT_USING_SPI
 
+//#define RT_USING_SDIO
+
+//#define RT_USING_CAN
+#ifdef RT_USING_CAN
 #define RT_CAN_USING_BUS_HOOK
-
 #define RT_CAN_USING_HDR
+#endif
+
 /* SECTION: device filesystem */
 /* #define RT_USING_DFS */
-
+#define RT_USING_DFS
+#ifdef RT_USING_DFS
+#define RT_USING_DFS_DEVFS
+#define RT_USING_DFS_NET
 #define RT_USING_DFS_ELMFAT
 /* Reentrancy (thread safe) of the FatFs module.  */
 #define RT_DFS_ELM_REENTRANT
 /* Number of volumes (logical drives) to be used. */
 #define RT_DFS_ELM_DRIVES			2
 /* #define RT_DFS_ELM_USE_LFN			1 */
+#define RT_DFS_ELM_USE_LFN			    3
 /* #define RT_DFS_ELM_CODE_PAGE			936 */
+#define RT_DFS_ELM_CODE_PAGE			437
 #define RT_DFS_ELM_MAX_LFN			255
 /* Maximum sector size to be handled. */
 #define RT_DFS_ELM_MAX_SECTOR_SIZE  512
 
+#define DFS_USING_WORKDIR
 /* the max number of mounted filesystem */
 #define DFS_FILESYSTEMS_MAX			2
 /* the max number of opened files 		*/
 #define DFS_FD_MAX					4
+#endif /* RT_USING_DFS */
 
 /* SECTION: lwip, a lighwight TCP/IP protocol stack */
 /* #define RT_USING_LWIP */
 /* Enable ICMP protocol*/
+
+#define RT_USING_LWIP
+#ifdef RT_USING_LWIP
+#define RT_USING_LWIP_ETH_DRIVER_DM9000     0
+#define RT_USING_LWIP_ETH_DRIVER_ENC28J60   1
+#define RT_USING_LWIP_ETH_DRIVER            RT_USING_LWIP_ETH_DRIVER_ENC28J60
+
+//#define RT_USING_DM9000
+#define RT_USING_ENC28J60
+
 #define RT_LWIP_ICMP
 /* Enable UDP protocol*/
 #define RT_LWIP_UDP
@@ -122,6 +158,7 @@
 
 /* Using DHCP */
 /* #define RT_LWIP_DHCP */
+#define RT_LWIP_DHCP
 
 /* ip address of target*/
 #define RT_LWIP_IPADDR0	192
@@ -141,6 +178,10 @@
 #define RT_LWIP_MSKADDR2	255
 #define RT_LWIP_MSKADDR3	0
 
+#define RT_LWIP_IPADDR                  "192.168.1.30"
+#define RT_LWIP_GWADDR                  "192.168.1.1"
+#define RT_LWIP_MSKADDR                 "255.255.255.0"
+
 /* tcp thread options */
 #define RT_LWIP_TCPTHREAD_PRIORITY		12
 #define RT_LWIP_TCPTHREAD_MBOX_SIZE		10
@@ -155,6 +196,7 @@
 #define RT_LWIP_TCP_SND_BUF	8192
 /* TCP receive window. */
 #define RT_LWIP_TCP_WND		8192
+#endif
 
 /* SECTION: RT-Thread/GUI */
 /* #define RT_USING_RTGUI */

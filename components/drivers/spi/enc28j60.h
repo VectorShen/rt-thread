@@ -320,9 +320,17 @@ struct net_device
 	/* spi device */
 	struct rt_spi_device * spi_device;
 	struct rt_mutex lock;
+
+	/* extend gpio */
+	rt_int32_t	power_pin;
+	rt_int32_t	rst_pin;
+	rt_int32_t	irq_pin;
 };
 
 /* export function */
+/* export function */
+extern void enc28j60_attach_pins(rt_int32_t power_pin, \
+  	rt_int32_t rst_pin, rt_int32_t irq_pin);
 extern rt_err_t enc28j60_attach(const char * spi_device_name);
 extern void enc28j60_isr(void);
 

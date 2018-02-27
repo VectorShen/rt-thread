@@ -19,7 +19,18 @@
 
 #ifdef RT_USING_PIN
 
-#define STM32F10X_PIN_NUMBERS 100 //[48, 64, 100, 144 ]
+//[48, 64, 100, 144 ]
+#if (defined STM32F10X_LD) || (defined STM32F10X_LD_VL)
+#define STM32F10X_PIN_NUMBERS 48
+#elif (defined STM32F10X_MD) || (defined STM32F10X_MD_VL)
+#define STM32F10X_PIN_NUMBERS 64
+#elif (defined STM32F10X_XL) || (defined STM32F10X_CL)
+#define STM32F10X_PIN_NUMBERS 100
+#elif (defined STM32F10X_HD) || (defined STM32F10X_HD_VL)
+#define STM32F10X_PIN_NUMBERS 144
+#else
+#define STM32F10X_PIN_NUMBERS 144
+#endif
 
 #define __STM32_PIN(index, rcc, gpio, gpio_index) { 0, RCC_##rcc##Periph_GPIO##gpio, GPIO##gpio, GPIO_Pin_##gpio_index}
 #define __STM32_PIN_DEFAULT {-1, 0, 0, 0}
