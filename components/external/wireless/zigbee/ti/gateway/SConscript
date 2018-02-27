@@ -1,0 +1,18 @@
+from building import *
+
+src = []
+path = []
+define = []
+
+version_query_src = Glob("Projects/zstack/linux/version_query_minitool/Source/*.c")
+version_query_path = [GetCurrentDir() + '/Projects/zstack/linux/version_query_minitool/Source']
+version_query_define = ['RTT_ZG_GATEWAY', '_GNU_SOURCE', 'xHAL_UART_SPI']
+
+if GetDepend(['RT_USING_ZIGBEE_TI_GATEWAY_VERSION_QUERY']):
+    src += version_query_src
+    path += version_query_path
+    define += version_query_define
+
+group = DefineGroup('zigbee', src, depend = ['RT_USING_ZIGBEE', 'RT_USING_ZIGBEE_TI', 'RT_USING_ZIGBEE_TI_GATEWAY'], CPPPATH = path, CPPDEFINES=define)
+
+Return('group')
