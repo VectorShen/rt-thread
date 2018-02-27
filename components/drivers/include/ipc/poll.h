@@ -25,6 +25,9 @@
 #ifndef IPC_POLL_H__
 #define IPC_POLL_H__
 
+#include <rtthread.h>
+#include <ipc/waitqueue.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

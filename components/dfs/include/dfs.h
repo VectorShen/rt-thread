@@ -34,6 +34,8 @@
 #include <rtthread.h>
 #include <rtdevice.h>
 
+//#include <libc/libc_stat.h>
+
 #ifndef DFS_FILESYSTEMS_MAX
 #define DFS_FILESYSTEMS_MAX     2
 #endif
@@ -94,6 +96,20 @@ struct dirent
     uint16_t d_reclen;        /* length of this record */
     char d_name[DFS_PATH_MAX];   /* The null-terminated file name */
 };
+
+#ifdef DFS_USING_C_FILE_EXTEND
+#define DFS_STDIN_FILE_NAME         "/stdin.txt"
+#define DFS_STDOUT_FILE_NAME        "/stdout.txt"
+#define DFS_STDERR_FILE_NAME        "/stderr.txt"
+
+extern struct dfs_fd* stdin ;
+extern struct dfs_fd* stdout;
+extern struct dfs_fd* stderr;
+
+#define stdin   stdin
+#define stdout  stdout
+#define stderr  stderr
+#endif
 
 /* Initialization of dfs */
 int dfs_init(void);

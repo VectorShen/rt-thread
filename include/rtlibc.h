@@ -26,13 +26,18 @@
 #define RTLIBC_H__
 
 /* definitions for libc if toolchain has no these definitions */
+#ifndef RT_USING_NEWLIB 
 #include "libc/libc_stat.h"
+#endif
+
 #include "libc/libc_errno.h"
 
 #include "libc/libc_fcntl.h"
 #include "libc/libc_ioctl.h"
 #include "libc/libc_dirent.h"
+#ifndef RT_USING_NEWLIB
 #include "libc/libc_signal.h"
+#endif
 #include "libc/libc_fdset.h"
 
 #if defined(__CC_ARM) || defined(__IAR_SYSTEMS_ICC__)

@@ -62,6 +62,7 @@
 #define RT_USING_PLATFORM_INIT
 
 #define RT_USING_POSIX
+#define RT_USING_POSIX_TERMIOS
 #define RT_USING_LIBC
 #define RT_USING_SIGNALS
 
@@ -106,6 +107,19 @@
 #define RT_CAN_USING_HDR
 #endif
 
+/* SECTION: wireless system */
+/* #define RT_USING_ZIGBEE */
+#define RT_USING_ZIGBEE
+#ifdef RT_USING_ZIGBEE
+#define RT_USING_ZIGBEE_TI
+#ifdef RT_USING_ZIGBEE_TI
+#define RT_USING_ZIGBEE_TI_GATEWAY
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY
+#define RT_USING_ZIGBEE_TI_GATEWAY_VERSION_QUERY
+#endif /* RT_USING_ZIGBEE_TI_GATEWAY */
+#endif /* RT_USING_ZIGBEE_TI*/
+#endif /* RT_USING_ZIGBEE */
+
 /* SECTION: device filesystem */
 /* #define RT_USING_DFS */
 #define RT_USING_DFS
@@ -126,6 +140,7 @@
 #define RT_DFS_ELM_MAX_SECTOR_SIZE  512
 
 #define DFS_USING_WORKDIR
+//#define DFS_USING_C_FILE_EXTEND
 /* the max number of mounted filesystem */
 #define DFS_FILESYSTEMS_MAX			2
 /* the max number of opened files 		*/

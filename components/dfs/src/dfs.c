@@ -41,6 +41,12 @@ char working_directory[DFS_PATH_MAX] = {"/"};
 
 struct dfs_fd fd_table[DFS_FD_MAX];
 
+#ifdef DFS_USING_C_FILE_EXTEND
+struct dfs_fd* stdin  = RT_NULL;
+struct dfs_fd* stdout = RT_NULL;
+struct dfs_fd* stderr = RT_NULL;
+#endif
+
 /**
  * @addtogroup DFS
  */

@@ -25,6 +25,7 @@
 #ifndef LIBC_SIGNAL_H__
 #define LIBC_SIGNAL_H__
 
+#include <rtconfig.h>
 
 #ifdef __cplusplus
 extern "C" {

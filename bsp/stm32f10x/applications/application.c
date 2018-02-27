@@ -85,6 +85,19 @@ void cali_store(struct calibration_data *data)
 }
 #endif /* RT_USING_RTGUI */
 
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY
+#if 0
+extern rt_uint8_t npi_lnx_ipc_stack[ 3072 ];
+extern struct rt_thread npi_lnx_ipc_thread;
+extern void npi_lnx_ipc_main(void* arg);
+#endif
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_VERSION_QUERY
+extern rt_uint8_t version_query_stack[ 2048 ];
+extern struct rt_thread version_query_thread;
+extern void version_query_main(void* arg);
+#endif
+#endif
+
 #ifdef RT_USING_PLATFORM_INIT
 extern void rt_platform_init(void);
 #endif /* RT_USING_PLATFORM_INIT */
@@ -140,6 +153,52 @@ void rt_init_thread_entry(void* parameter)
         calibration_init();
     }
 #endif /* #ifdef RT_USING_RTGUI */
+
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY
+#if 0
+    rt_err_t result;
+
+    /* init led thread */
+    result = rt_thread_init(&npi_lnx_ipc_thread,
+                            "npi_lnx_ipc",
+                            npi_lnx_ipc_main,
+                            RT_NULL,
+                            (rt_uint8_t*)&npi_lnx_ipc_stack[0],
+                            sizeof(npi_lnx_ipc_stack),
+                            9,
+                            20);
+    if (result == RT_EOK)
+    {
+        rt_thread_startup(&npi_lnx_ipc_thread);
+    }
+#endif
+#if 0
+    rt_thread_t zb_gateway_thread;
+    zb_gateway_thread = rt_thread_create("zb_gateway",
+                                   npi_lnx_ipc_main, RT_NULL,
+                                   3072, 9, 20);
+
+    if (zb_gateway_thread != RT_NULL)
+        rt_thread_startup(zb_gateway_thread);
+#endif
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_VERSION_QUERY
+    rt_err_t result;
+
+    /* init led thread */
+    result = rt_thread_init(&version_query_thread,
+                            "version_query",
+                            version_query_main,
+                            RT_NULL,
+                            (rt_uint8_t*)&version_query_stack[0],
+                            sizeof(version_query_stack),
+                            9,
+                            20);
+    if (result == RT_EOK)
+    {
+        rt_thread_startup(&version_query_thread);
+    }
+#endif
+#endif
 }
 
 int rt_application_init(void)

@@ -35,6 +35,96 @@
 extern "C" {
 #endif
 
+#ifdef DFS_USING_C_FILE_EXTEND
+#undef FILE
+#undef fopen
+#undef fclose
+#undef fgets
+#undef fflush
+#undef ftell
+#undef fseek
+#undef fwrite
+#undef fread
+#undef rewind
+#undef fprintf
+#undef putc
+#undef fputc
+#undef fputs
+
+#define _FREAD      0x0001  /* read enabled */
+#define _FWRITE     0x0002  /* write enabled */
+#define _FAPPEND    0x0008  /* append (writes guaranteed at the end) */
+#define _FMARK      0x0010  /* internal; mark during gc() */
+#define _FDEFER     0x0020  /* internal; defer for next gc pass */
+#define _FASYNC     0x0040  /* signal pgrp when data ready */
+#define _FSHLOCK    0x0080  /* BSD flock() shared lock present */
+#define _FEXLOCK    0x0100  /* BSD flock() exclusive lock present */
+#define _FCREAT     0x0200  /* open with file create */
+#define _FTRUNC     0x0400  /* open with truncation */
+#define _FEXCL      0x0800  /* error on open if file exists */
+#define _FNBIO      0x1000  /* non blocking I/O (sys5 style) */
+#define _FSYNC      0x2000  /* do all writes synchronously */
+#define _FNONBLOCK  0x4000  /* non blocking I/O (POSIX style) */
+#define _FNDELAY    _FNONBLOCK  /* non blocking I/O (4.2 style) */
+#define _FNOCTTY    0x8000  /* don't assign a ctty on this open */
+
+#define FASYNC		_FSYNC
+#define FNDELAY		_FNDELAY
+
+#if 0
+#define O_RDONLY    0       /* +1 == FREAD */
+#define O_WRONLY    1       /* +1 == FWRITE */
+#define O_RDWR      2       /* +1 == FREAD|FWRITE */
+#define O_APPEND    _FAPPEND
+#define O_CREAT     _FCREAT
+#define O_TRUNC     _FTRUNC
+#define O_EXCL      _FEXCL
+#define O_SYNC      _FSYNC
+#endif
+
+/*
+r              open text file for reading
+w              truncate to zero length or create text file for writing
+wx             create text file for writing
+a              append; open or create text file for writing at end-of-file
+rb             open binary file for reading
+wb             truncate to zero length or create binary file for writing
+wbx            create binary file for writing
+ab             append; open or create binary file for writing at end-of-file
+r+             open text file for update (reading and writing)
+w+             truncate to zero length or create text file for update
+w+x            create text file for update
+a+             append; open or create text file for update, writing at end-of-file
+r+b  or rb+    open binary file for update (reading and writing)
+w+b  or wb+    truncate to zero length or create binary file for update
+w+bx or wb+x   create binary file for update
+a+b  or ab+    append; open or create binary file for update, writing at end-of-file
+*/
+
+#define C_FILE_O_TEXT_EXIST_FILE_FOR_RDONLY                 "r"
+#define C_FILE_O_TEXT_TRUNCATE_ZERO_OR_CREATE_FOR_WRONLY    "w"
+#define C_FILE_O_TEXT_CREATE_FOR_WRONLY                     "wx"
+#define C_FILE_O_TEXT_APPEND_FOR_WRONLY                     "a"
+#define C_FILE_O_BINARY_EXIST_FILE_FOR_RDONLY               "rb"
+#define C_FILE_O_BINARY_TRUNCATE_ZERO_OR_CREATE_FOR_WRONLY  "wb"
+#define C_FILE_O_BINARY_CREATE_FOR_WRONLY                   "wbx"
+#define C_FILE_O_BINARY_APPEND_FOR_WRONLY                   "ab"
+#define C_FILE_O_TEXT_EXIST_FILE_FOR_RDWR                   "r+"
+#define C_FILE_O_TEXT_TRUNCATE_ZERO_OR_CREATE_FOR_RDWR      "w+"
+#define C_FILE_O_TEXT_CREATE_FOR_RDWR                       "w+x"
+#define C_FILE_O_TEXT_APPEND_FOR_RDWR                       "a+"
+#define C_FILE_O_BINARY_EXIST_FILE_FOR_RDWR_1               "r+b"
+#define C_FILE_O_BINARY_EXIST_FILE_FOR_RDWR_2               "rb+"
+#define C_FILE_O_BINARY_TRUNCATE_ZERO_OR_CREATE_FOR_RDWR_1  "w+b"
+#define C_FILE_O_BINARY_TRUNCATE_ZERO_OR_CREATE_FOR_RDWR_2  "wb+"
+#define C_FILE_O_BINARY_CREATE_FOR_RDWR_1                   "w+bx"
+#define C_FILE_O_BINARY_CREATE_FOR_RDWR_2                   "wb+x"
+#define C_FILE_O_BINARY_APPEND_FOR_RDWR_1                   "a+b"
+#define C_FILE_O_BINARY_APPEND_FOR_RDWR_2                   "ab+"
+
+#define FPRINTF_MAX_BUFFER_SIZE         128
+#endif
+
 typedef struct
 {
     int fd;     /* directory file */
@@ -82,6 +172,23 @@ int statfs(const char *path, struct statfs *buf);
 int access(const char *path, int amode);
 int pipe(int fildes[2]);
 int mkfifo(const char *path, mode_t mode);
+
+#ifdef DFS_USING_C_FILE_EXTEND
+FILE * fopen(const char * path, const char * mode);
+char *fgets(char *buf, int bufsize, FILE *stream);
+int fclose( FILE *fp );
+int fflush(FILE *stream);
+long ftell(FILE *stream);
+int fseek(FILE *stream, long offset, int fromwhere);
+size_t fwrite(const void* buffer, size_t size, size_t count, FILE* stream);
+size_t fread ( void *buffer, size_t size, size_t count, FILE *stream);
+void rewind(FILE *stream);
+
+int fprintf(FILE* fp, char* fmt, ...);
+int putc(int ch, FILE *stream);
+int fputc(int ch, FILE *stream);
+int fputs(const char *s, FILE *stream);
+#endif
 
 #ifdef __cplusplus
 }

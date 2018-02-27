@@ -29,7 +29,7 @@
 #include <rtthread.h>
 
 #ifdef RT_USING_SIGNALS
-#include <libc/libc_signal.h>
+//#include <libc/libc_signal.h>
 #ifndef RT_SIG_INFO_MAX
 #define RT_SIG_INFO_MAX 32
 
