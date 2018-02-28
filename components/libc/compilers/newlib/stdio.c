@@ -29,6 +29,10 @@
 #include <rtthread.h>
 #include "libc.h"
 
+#ifdef DFS_USING_C_FILE_EXTEND
+#include <dfs_posix.h>
+#endif
+
 #define STDIO_DEVICE_NAME_MAX   32
 
 static FILE* std_console = NULL;
