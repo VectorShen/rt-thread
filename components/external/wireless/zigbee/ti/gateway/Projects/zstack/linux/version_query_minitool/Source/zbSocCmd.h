@@ -43,13 +43,15 @@
 extern "C"
 {
 #endif
-
+#include <rtconfig.h>
 /*********************************************************************
  * INCLUDES
  */
 #include <stdint.h>
 #include <stdbool.h>
-
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_VERSION_QUERY
+#include <dfs_posix.h>
+#endif
 /*********************************************************************
  * CONSTANTS
  */
