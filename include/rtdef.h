@@ -49,8 +49,10 @@ extern "C" {
 /**
  * @addtogroup BasicDef
  */
-#ifndef __cplusplus
+#if 0	//ndef __cplusplus
+#ifndef bool
   #define bool    _Bool
+#endif
   #define true    1
   #define false   0
 #endif
