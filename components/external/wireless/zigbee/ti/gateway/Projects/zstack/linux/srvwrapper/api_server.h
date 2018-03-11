@@ -65,8 +65,9 @@ extern size_t APIS_threadStackSize;
 /*********************************************************************
  * CONSTANTS
  */
-
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 #define API_SERVER_DEFAULT_PORT 2536
+#endif /* RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET */
 
 /*********************************************************************
  * TYPEDEFS

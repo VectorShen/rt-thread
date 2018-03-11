@@ -3,6 +3,9 @@
 #ifndef PROTOBUF_C_zstack_2eproto__INCLUDED
 #define PROTOBUF_C_zstack_2eproto__INCLUDED
 
+#ifdef RTT_ZG_GATEWAY
+#include <rtconfig.h>
+#endif /* RTT_ZG_GATEWAY */
 #include <google/protobuf-c/protobuf-c.h>
 
 PROTOBUF_C_BEGIN_DECLS

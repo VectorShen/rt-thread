@@ -49,6 +49,7 @@ extern "C"
  */
 #include <stdlib.h>
 #ifdef RTT_ZG_GATEWAY
+#include <rtthread.h>
 #include "hal_types.h" 
 #endif
 /* ------------------------------------------------------------------------------------------------

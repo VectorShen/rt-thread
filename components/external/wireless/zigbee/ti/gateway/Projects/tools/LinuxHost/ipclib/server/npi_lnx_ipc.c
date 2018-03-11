@@ -52,10 +52,12 @@
 #include <errno.h>
 #include <string.h>
 #include <sys/types.h>
-   
+
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 #include <sys/socket.h>
 #include <sys/un.h>
-   
+#endif
+
 #include <unistd.h>
 
 // For stress testing data dump
@@ -63,6 +65,7 @@
 #include <sys/stat.h>
 #include <time.h>
 
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 #ifndef NPI_UNIX
 
 #ifndef RTT_ZG_GATEWAY
@@ -73,8 +76,10 @@
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #endif
+#endif
 
 #ifdef RTT_ZG_GATEWAY
+#include <rtconfig.h>
 #include "npi_lnx_ipc.h"
 
 #undef printf
@@ -114,12 +119,12 @@
 #endif
 
 #ifdef __BIG_DEBUG__
-#define debug_printf(fmt, ...) printf( fmt, ##__VA_ARGS__)
+#define debug_printf(fmt, ...) 	printf( fmt, ##__VA_ARGS__)
 #else
-#define debug_printf(fmt, ...) st (if (__BIG_DEBUG_ACTIVE == TRUE) printf( fmt, ##__VA_ARGS__);)
+#define debug_printf(fmt, ...) 	st (if (__BIG_DEBUG_ACTIVE == TRUE) printf( fmt, ##__VA_ARGS__);)
 #endif
 
-#define time_printf(fmt, ...) st (if (__DEBUG_TIME_ACTIVE == TRUE) printf( fmt, ##__VA_ARGS__);)
+#define time_printf(fmt, ...) 	st (if (__DEBUG_TIME_ACTIVE == TRUE) printf( fmt, ##__VA_ARGS__);)
 
 /**************************************************************************************************
  *                                        Externals
@@ -128,7 +133,9 @@
 /**************************************************************************************************
  *                                        Defines
  **************************************************************************************************/
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 #define NPI_SERVER_CONNECTION_QUEUE_SIZE        20
+#endif
 
 #define MAX(a,b)								((a > b) ? a : b)
 
@@ -138,8 +145,12 @@
 #ifdef RTT_ZG_GATEWAY
 rt_uint8_t npi_lnx_ipc_stack[ 3072 ];
 struct rt_thread npi_lnx_ipc_thread;
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_MB
 
-//4个邮箱系统
+struct rt_mailbox npi_lnx_ipc_mb;
+static char npi_lnx_ipc_mb_pool[NPI_LNX_IPC_MB_SIZE];
+
+#if 0
 struct rt_mailbox zlsznp_mb;
 static char zlsznp_mb_pool[NPI_LNX_IPC_ZLSZNP_MB_SIZE];
 struct rt_mailbox netmgr_mb;
@@ -148,8 +159,11 @@ struct rt_mailbox gateway_mb;
 static char gateway_mb_pool[NPI_LNX_IPC_GATEWAY_MB_SIZE];
 struct rt_mailbox otaserver_mb;
 static char otaserver_mb_pool[NPI_LNX_IPC_OTASERVER_MB_SIZE];
-
 #endif
+
+#endif /* RT_USING_ZIGBEE_TI_GATEWAY_IPC_MB */
+#endif
+
 const char* sectionNamesArray[3][2] =
 {
 	{
@@ -166,8 +180,10 @@ const char* sectionNamesArray[3][2] =
 	},
 };
 
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 //const char *port = "";
 char port[128];
+#endif /* RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET */
 
 enum
 {
@@ -295,7 +311,7 @@ int __DEBUG_TIME_ACTIVE = FALSE;		// Do not enable by default.
 /**************************************************************************************************
  *                                        Local Variables
  **************************************************************************************************/
-
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 // Socket handles
 uint32 sNPIlisten;
 
@@ -307,6 +323,7 @@ struct
 	int list[NPI_SERVER_CONNECTION_QUEUE_SIZE];
 	int size;
 } activeConnections;
+#endif
 
 // NPI IPC Server buffers
 char npi_ipc_buf[2][sizeof(npiMsgData_t)];
@@ -365,8 +382,10 @@ static uint8 devIdx = 0;
 int NPI_LNX_IPC_SendData(uint8 len, int connection);
 int NPI_LNX_IPC_ConnectionHandle(int connection);
 
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 int removeFromActiveList(int c);
 int addToActiveList(int c);
+#endif
 
 void writeToNpiLnxLog(const char* str);
 
@@ -434,7 +453,7 @@ void writeToNpiLnxLog(const char* str)
 	if (npiLnxLogFd > 0)
 	{
 		write(npiLnxLogFd, fullStr, strlen(fullStr) + 1);
-//		printf("Wrote:\n%s\n to npiLnxLog.log\n", fullStr, errno);
+		printf("Wrote:\n%s\n to npiLnxLog.log\n", fullStr, errno);
 	}
 	else
 	{
@@ -522,6 +541,8 @@ void npi_lnx_ipc_main(void* arg)  //int argc, char ** argv)
 	}
 #else
     char* configFilePath = "/RemoTI_RNP.cfg";
+	int ret = NPI_LNX_SUCCESS;
+	char* strBuf;
 #endif
 
 	// Allocate memory for string buffer and configuration buffer
@@ -882,6 +903,7 @@ void npi_lnx_ipc_main(void* arg)  //int argc, char ** argv)
 			break;
 	}
 
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 	// Get port from configuration file
 	if (NPI_LNX_FAILURE == (SerialConfigParser(serialCfgFd, "PORT", "port", strBuf)))
 	{
@@ -895,7 +917,7 @@ void npi_lnx_ipc_main(void* arg)  //int argc, char ** argv)
 	{
 		strncpy(port, strBuf, 128);
 	}
-
+#endif
 
 	// The following will exit if ret != SUCCESS
 	NPI_LNX_IPC_Exit(ret);
@@ -929,7 +951,7 @@ void npi_lnx_ipc_main(void* arg)  //int argc, char ** argv)
 	fprintf(fpStressTestData, "*******************************************************************\n");
 #endif //__STRESS_TEST__
 
-#ifndef RTT_ZG_GATEWAY
+#if (defined RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET)
 	/**********************************************************************
 	 * Now that everything has been initialized and configured, let's open
 	 * a socket and begin listening.
@@ -1285,18 +1307,60 @@ void npi_lnx_ipc_main(void* arg)  //int argc, char ** argv)
 		}
 	}
 	free(toNpiLnxLog);
-#else
-    
+#elif (defined RT_USING_ZIGBEE_TI_GATEWAY_IPC_MB)
+	//初始化邮箱
+    rt_mb_init(&npi_lnx_ipc_mb,
+    			NPI_LNX_IPC_MB_NAME,             /* 名称是mbt */
+				&npi_lnx_ipc_mb_pool[0],       /* 邮箱用到的内存池是mb_pool */
+				sizeof(npi_lnx_ipc_mb_pool)/4, /* 大小是mb_pool大小除以4，因为一封邮件的大小是4字节 */
+				RT_IPC_FLAG_FIFO); /* 采用FIFO方式进行线程等待 */
+#if 0
+    rt_mb_init(&zlsznp_mb,
+    			NPI_LNX_IPC_ZLSZNP_MB_NAME,             /* 名称是mbt */
+				&zlsznp_mb_pool[0],       /* 邮箱用到的内存池是mb_pool */
+				sizeof(zlsznp_mb_pool)/4, /* 大小是mb_pool大小除以4，因为一封邮件的大小是4字节 */
+				RT_IPC_FLAG_FIFO); /* 采用FIFO方式进行线程等待 */
+    rt_mb_init(&netmgr_mb,
+    			NPI_LNX_IPC_NETMGR_MB_NAME,             /* 名称是mbt */
+				&netmgr_mb_pool[0],       /* 邮箱用到的内存池是mb_pool */
+				sizeof(netmgr_mb_pool)/4, /* 大小是mb_pool大小除以4，因为一封邮件的大小是4字节 */
+				RT_IPC_FLAG_FIFO); /* 采用FIFO方式进行线程等待 */
+    rt_mb_init(&gateway_mb,
+    			NPI_LNX_IPC_GATEWAY_MB_NAME,             /* 名称是mbt */
+				&gateway_mb_pool[0],       /* 邮箱用到的内存池是mb_pool */
+				sizeof(gateway_mb_pool)/4, /* 大小是mb_pool大小除以4，因为一封邮件的大小是4字节 */
+				RT_IPC_FLAG_FIFO); /* 采用FIFO方式进行线程等待 */
+    rt_mb_init(&otaserver_mb,
+    			NPI_LNX_IPC_OTASERVER_MB_NAME,             /* 名称是mbt */
+				&otaserver_mb_pool[0],       /* 邮箱用到的内存池是mb_pool */
+				sizeof(otaserver_mb_pool)/4, /* 大小是mb_pool大小除以4，因为一封邮件的大小是4字节 */
+				RT_IPC_FLAG_FIFO); /* 采用FIFO方式进行线程等待 */
+#endif
+	//通过内部邮箱来与zigbee独立应用通信
+	while (ret == NPI_LNX_SUCCESS)
+	{
+        /* 从邮箱中收取邮件 */
+        if (rt_mb_recv(&npi_lnx_ipc_mb, (rt_uint32_t*)&npi_ipc_buf, NPI_LNX_IPC_WAIT_TICKS) == RT_EOK)
+        {
+        	//handle
+			ret = NPI_LNX_IPC_ConnectionHandle(0);
+			if (ret == NPI_LNX_SUCCESS)
+			{
+				// Everything is ok
+			}
+        }
+	}
 #endif
 
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 	printf("Exit socket while loop\n");
 	/**********************************************************************
 	 * Remember to close down all connections
 	 *********************************************************************/
-
 #ifndef NPI_UNIX
 	freeaddrinfo(servinfo); // free the linked-list
 #endif //NPI_UNIX
+#endif
 	(NPI_CloseDeviceFnArr[devIdx])();
 
 	// Free all remaining memory
@@ -1310,7 +1374,7 @@ void npi_lnx_ipc_main(void* arg)  //int argc, char ** argv)
 	//return ret;
 }
 
-
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 /**************************************************************************************************
  *
  * @fn          addToActiveList
@@ -1378,7 +1442,6 @@ int removeFromActiveList(int c)
 			break;
 	}
 
-
 	if (i < activeConnections.size)
 	{
 		//Check if the last active conection has been removed
@@ -1416,6 +1479,7 @@ int removeFromActiveList(int c)
 		return NPI_LNX_FAILURE;
 	}
 }
+#endif
 
 /**************************************************************************************************
  *
@@ -1437,10 +1501,12 @@ int removeFromActiveList(int c)
 int NPI_LNX_IPC_ConnectionHandle(int connection)
 {
 	int n, i, ret = NPI_LNX_SUCCESS;
-
+#if (defined RT_USING_ZIGBEE_TI_GATEWAY_IPC_MB)
+	char* buf = RT_NULL;
+#endif
 	// Handle the connection
 	debug_printf("Receive message...\n");
-
+#if (defined RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET)
 	// Receive only NPI header first. Then then number of bytes indicated by length.
 	n = recv(connection, npi_ipc_buf[0], RPC_FRAME_HDR_SZ, 0);
 	if (n <= 0)
@@ -1695,7 +1761,214 @@ int NPI_LNX_IPC_ConnectionHandle(int connection)
 	{
 		debug_printf("!Done\n");
 	}
+#elif 0 //(defined RT_USING_ZIGBEE_TI_GATEWAY_IPC_MB)
+	//这边做改进，将npi_ipc_buf的第一个字节作为数据包的长度判别符
+	// Receive only NPI header first. Then then number of bytes indicated by length.
+	buf = npi_ipc_buf;
+	if(buf[0] <= 0)
+	{
+		if (n < 0)
+		{
+			perror("recv");
+			if ( (errno == ENOTSOCK) || (errno == EPIPE))
+			{
+				debug_printf("[ERROR] Tried to read #%d as socket\n", connection);
+				debug_printf("Will disconnect #%d\n", connection);
+				npi_ipc_errno = NPI_LNX_ERROR_IPC_RECV_DATA_DISCONNECT;
+				ret = NPI_LNX_FAILURE;
+			}
+			else if (errno == ECONNRESET)
+			{
+//				debug_
+				printf("[WARNING] Client disconnect while attempting to send to it\n");
+				debug_printf("Will disconnect #%d\n", connection);
+				npi_ipc_errno = NPI_LNX_ERROR_IPC_RECV_DATA_DISCONNECT;
+				ret = NPI_LNX_FAILURE;
+			}
+			else
+			{
+				npi_ipc_errno = NPI_LNX_ERROR_IPC_RECV_DATA_CHECK_ERRNO;
+				ret = NPI_LNX_FAILURE;
+			}
+		}
+		else
+		{
+			debug_printf("Will disconnect #%d\n", connection);
+			npi_ipc_errno = NPI_LNX_ERROR_IPC_RECV_DATA_DISCONNECT;
+			ret = NPI_LNX_FAILURE;
+		}
+	}
+	else
+	{
+		// Now read out the payload of the NPI message, if it exists
+		if (((npiMsgData_t *) npi_ipc_buf[0])->len > 0)
+		{
+			n = recv(connection, (uint8*) &npi_ipc_buf[0][RPC_FRAME_HDR_SZ], ((npiMsgData_t *) npi_ipc_buf[0])->len , 0);
+			if (n != ((npiMsgData_t *) npi_ipc_buf[0])->len)
+			{
+				printf("[ERR] Could not read out the NPI payload. Requested %d, but read %d!\n",
+						((npiMsgData_t *) npi_ipc_buf[0])->len, n);
+				npi_ipc_errno = NPI_LNX_ERROR_IPC_RECV_DATA_TOO_FEW_BYTES;
+				ret = NPI_LNX_FAILURE;
+				if (n < 0)
+				{
+					perror("recv");
+					// Disconnect this
+					npi_ipc_errno = NPI_LNX_ERROR_IPC_RECV_DATA_DISCONNECT;
+					ret = NPI_LNX_FAILURE;
+				}
+			}
+			else
+			{
+				ret = NPI_LNX_SUCCESS;
+			}
+			// n is only used by debug traces from here on, but add header length
+			// so the whole message is written out
+			n += RPC_FRAME_HDR_SZ;
+		}
+		/*
+		 * Take the message from the client and pass it to the NPI
+		 */
 
+		if (((uint8) (((npiMsgData_t *) npi_ipc_buf[0])->subSys) & (uint8) RPC_CMD_TYPE_MASK) == RPC_CMD_SREQ)
+		{
+			debug_printf("NPI SREQ:  (len %d)", n);
+			for (i = 0; i < n; i++)
+			{
+				debug_printf(" 0x%.2X", (uint8)npi_ipc_buf[0][i]);
+			}
+			debug_printf("\n");
+
+			if (((uint8) (((npiMsgData_t *) npi_ipc_buf[0])->subSys) & (uint8) RPC_SUBSYSTEM_MASK) == RPC_SYS_SRV_CTRL)
+			{
+
+				//SREQ Command send to this server.
+				ret = npi_ServerCmdHandle((npiMsgData_t *)npi_ipc_buf[0]);
+			}
+			else
+			{
+				uint8 sreqHdr[RPC_FRAME_HDR_SZ] = {0};
+				// Retain the header for later integrety check
+				memcpy(sreqHdr, npi_ipc_buf[0], RPC_FRAME_HDR_SZ);
+				// Synchronous request requires an answer...
+				ret = (NPI_SendSynchDataFnArr[devIdx])(
+						(npiMsgData_t *) npi_ipc_buf[0]);
+				if ( (ret != NPI_LNX_SUCCESS) &&
+						( (npi_ipc_errno == NPI_LNX_ERROR_HAL_GPIO_WAIT_SRDY_CLEAR_POLL_TIMEDOUT) ||
+							(npi_ipc_errno == NPI_LNX_ERROR_HAL_GPIO_WAIT_SRDY_SET_POLL_TIMEDOUT) ))
+				{
+					// Report this error to client through a pseudo response
+					((npiMsgData_t *) npi_ipc_buf[0])->len = 1;
+					((npiMsgData_t *) npi_ipc_buf[0])->pData[0] = 0xFF;
+				}
+				else
+				{
+					// Capture incoherent SRSP, check type and subsystem
+					if ( ( (((npiMsgData_t *) npi_ipc_buf[0])->subSys & ~(RPC_SUBSYSTEM_MASK)) != RPC_CMD_SRSP )
+						||
+						 ( (((npiMsgData_t *) npi_ipc_buf[0])->subSys & (RPC_SUBSYSTEM_MASK)) != (sreqHdr[RPC_POS_CMD0] & RPC_SUBSYSTEM_MASK))
+						)
+					{
+						// Report this error to client through a pseudo response
+						((npiMsgData_t *) npi_ipc_buf[0])->len = 1;
+						((npiMsgData_t *) npi_ipc_buf[0])->subSys = (sreqHdr[RPC_POS_CMD0] & RPC_SUBSYSTEM_MASK) | RPC_CMD_SRSP;
+						((npiMsgData_t *) npi_ipc_buf[0])->cmdId = sreqHdr[RPC_POS_CMD1];
+						((npiMsgData_t *) npi_ipc_buf[0])->pData[0] = 0xFF;
+					}
+				}
+			}
+
+			if ( (ret == NPI_LNX_SUCCESS) ||
+						(npi_ipc_errno == NPI_LNX_ERROR_HAL_GPIO_WAIT_SRDY_CLEAR_POLL_TIMEDOUT) ||
+						(npi_ipc_errno == NPI_LNX_ERROR_HAL_GPIO_WAIT_SRDY_SET_POLL_TIMEDOUT) )
+			{
+				n = ((npiMsgData_t *) npi_ipc_buf[0])->len + RPC_FRAME_HDR_SZ;
+
+				// Copy response into transmission buffer
+				memcpy(npi_ipc_buf[1], npi_ipc_buf[0], n);
+
+				// Command type is not set, so set it here
+				((npiMsgData_t *) npi_ipc_buf[1])->subSys |= RPC_CMD_SRSP;
+
+				if (n > 0)
+				{
+					debug_printf("NPI SRSP: (len %d)", n);
+					for (i = 0; i < n; i++)
+					{
+						debug_printf(" 0x%.2X", (uint8)npi_ipc_buf[1][i]);
+					}
+					debug_printf("\n");
+				}
+				else
+				{
+					printf("[ERR] SRSP is 0!\n");
+				}
+
+				//			pthread_mutex_lock(&npiSyncRespLock);
+				// Send bytes
+				ret = NPI_LNX_IPC_SendData(n, connection);
+			}
+			else
+			{
+				// Keep status from NPI_SendSynchDataFnArr
+				debug_printf("[ERR] SRSP: npi_ipc_errno 0x%.8X\n", npi_ipc_errno);
+			}
+		}
+		else if (((uint8) (((npiMsgData_t *) npi_ipc_buf[0])->subSys) & (uint8) RPC_CMD_TYPE_MASK) == RPC_CMD_AREQ)
+		{
+			debug_printf("NPI AREQ: (len %d)", n);
+			for (i = 0; i < n; i++)
+			{
+				debug_printf(" 0x%.2X", (uint8)npi_ipc_buf[0][i]);
+			}
+			debug_printf("\n");
+
+			if (((uint8) (((npiMsgData_t *) npi_ipc_buf[0])->subSys) & (uint8) RPC_SUBSYSTEM_MASK) == RPC_SYS_SRV_CTRL)
+			{
+				//AREQ Command send to this server.
+				ret = npi_ServerCmdHandle((npiMsgData_t *)npi_ipc_buf[0]);
+			}
+			else
+			{
+				// Asynchronous request may just be sent
+				ret = (NPI_SendAsynchDataFnArr[devIdx])(
+						(npiMsgData_t *) npi_ipc_buf[0]);
+			}
+		}
+		else if (((uint8) (((npiMsgData_t *) npi_ipc_buf[0])->subSys) & (uint8) RPC_CMD_TYPE_MASK)  == RPC_CMD_NOTIFY_ERR)
+		{
+			// An error occurred in a child thread.
+			ret = NPI_LNX_FAILURE;
+		}
+		else
+		{
+			printf("Can only accept AREQ or SREQ for now...\n");
+			printf("Unknown: (len %d)", n);
+			for (i = 0; i < n; i++)
+			{
+				printf(" 0x%.2X", (uint8)npi_ipc_buf[0][i]);
+			}
+			printf("\n");
+
+			npi_ipc_errno = NPI_LNX_ERROR_IPC_RECV_DATA_INCOMPATIBLE_CMD_TYPE;
+			ret = NPI_LNX_FAILURE;
+		}
+	}
+
+#if (defined __BIG_DEBUG__) && (__BIG_DEBUG__ == TRUE)
+	// This will effectively result in an echo
+	memcpy(npi_ipc_buf[1], npi_ipc_buf[0], sizeof(npiMsgData_t));
+#endif
+
+	if ((ret == NPI_LNX_FAILURE) && (npi_ipc_errno == NPI_LNX_ERROR_IPC_RECV_DATA_DISCONNECT))
+	{
+		debug_printf("Done with %d\n", connection);
+	}
+	else
+	{
+		debug_printf("!Done\n");
+	}
+#endif
 	return ret;
 }
 
@@ -1790,6 +2063,7 @@ int NPI_LNX_IPC_SendData(uint8 len, int connection)
 	}
 #endif //__DEBUG_TIME__
 
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 	if (connection < 0)
 	{
 #ifdef __BIG_DEBUG__
@@ -1871,6 +2145,7 @@ int NPI_LNX_IPC_SendData(uint8 len, int connection)
 			}
 		}
 	}
+#endif
 
 	return ret;
 }
@@ -2192,6 +2467,7 @@ void NPI_LNX_IPC_Exit(int ret)
 int NPI_LNX_IPC_NotifyError(uint16 source, const char* errorMsg)
 {
 	int ret = NPI_LNX_SUCCESS;
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 	int sNPIconnected;
 #ifndef NPI_UNIX
 	struct addrinfo *resAddr;
@@ -2314,7 +2590,7 @@ int NPI_LNX_IPC_NotifyError(uint16 source, const char* errorMsg)
 	msg.cmdId = source;
 
 	send(sNPIconnected, &msg, msg.len + RPC_FRAME_HDR_SZ, MSG_NOSIGNAL);
-
+#endif
 	return ret;
 }
 
@@ -2385,11 +2661,12 @@ static int npi_ServerCmdHandle(npiMsgData_t *pNpi_ipc_buf)
 				case NPI_LNX_PARAM_NB_CONNECTIONS:
 					pNpi_ipc_buf->len = 3;
 					pNpi_ipc_buf->pData[0] = NPI_LNX_SUCCESS;
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 					//Number of Active Connections
 					pNpi_ipc_buf->pData[1] = activeConnections.size;
 					//Max number of possible connections.
 					pNpi_ipc_buf->pData[2] = NPI_SERVER_CONNECTION_QUEUE_SIZE;
-
+#endif
 					ret = NPI_LNX_SUCCESS;
 					break;
 				case NPI_LNX_PARAM_DEVICE_USED:

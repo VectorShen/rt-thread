@@ -54,6 +54,7 @@
 #include <poll.h>
 #else
 #include <ipc/poll.h>
+#include <libc/libc_signal.h>
 #endif
    
 #include <sys/time.h>

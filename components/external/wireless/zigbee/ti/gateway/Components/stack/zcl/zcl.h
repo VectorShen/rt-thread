@@ -48,10 +48,14 @@ extern "C"
 /*********************************************************************
  * INCLUDES
  */
+#ifdef RTT_ZG_GATEWAY
+#include <rtconfig.h>
+#endif /* RTT_ZG_GATEWAY */
+
 #if !defined ( ZCL_STANDALONE )
-  #include "OSAL.h"
-  #include "OSAL_Nv.h"
-  #include "OSAL_Tasks.h"
+	#include "OSAL.h"
+	#include "OSAL_Nv.h"
+  	#include "OSAL_Tasks.h"
 #endif
 
 #include "AF.h"

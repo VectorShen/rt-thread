@@ -6,7 +6,10 @@ cwd = GetCurrentDir()
 group = []
 
 CPPPATH = [cwd]
-CPPDEFINES = ['_SYS_SIGNAL_H', '_SYS_STAT_H', '_SIGNAL_H_'] 
+CPPDEFINES = ['_SYS_SIGNAL_H', '_SYS_STAT_H', '_SIGNAL_H_', '_SYS_SCHED_H_', '_SYS__PTHREADTYPES_H_']
+
+if GetDepend(['DFS_USING_C_FILE_EXTEND']):
+    CPPDEFINES += ['_STDIO_H_']
 #CPPDEFINES = ['RT_USING_NEWLIB']
 
 # link with libc and libm:

@@ -3,16 +3,16 @@
 #define __RTTHREAD_CFG_H__
 
 /* RT_NAME_MAX*/
-#define RT_NAME_MAX	8
+#define RT_NAME_MAX					8
 
 /* RT_ALIGN_SIZE*/
-#define RT_ALIGN_SIZE	4
+#define RT_ALIGN_SIZE				4
 
 /* PRIORITY_MAX */
-#define RT_THREAD_PRIORITY_MAX	32
+#define RT_THREAD_PRIORITY_MAX		32
 
 /* Tick per Second */
-#define RT_TICK_PER_SECOND	100
+#define RT_TICK_PER_SECOND			100
 
 /* SECTION: RT_DEBUG */
 /* Thread Debug */
@@ -65,6 +65,7 @@
 #define RT_USING_POSIX_TERMIOS
 #define RT_USING_LIBC
 #define RT_USING_SIGNALS
+#define RT_USING_PTHREADS
 
 /* SECTION: Device System */
 /* Using Device System */
@@ -115,7 +116,18 @@
 #ifdef RT_USING_ZIGBEE_TI
 #define RT_USING_ZIGBEE_TI_GATEWAY
 #ifdef RT_USING_ZIGBEE_TI_GATEWAY
+#define RT_USING_ZIGBEE_TI_GATEWAY_IPC_MB
+//#define RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
+
+#define RT_USING_ZIGBEE_TI_GATEWAY_NWKMGR
 #define RT_USING_ZIGBEE_TI_GATEWAY_VERSION_QUERY
+#define RT_USING_ZIGBEE_TI_GATEWAY_NPI
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_NPI
+#define RT_USING_ZIGBEE_TI_GATEWAY_NPI_UART
+//#define RT_USING_ZIGBEE_TI_GATEWAY_NPI_SPI
+//#define RT_USING_ZIGBEE_TI_GATEWAY_NPI_I2C
+#endif /* RT_USING_ZIGBEE_TI_GATEWAY_NPI */
+
 #endif /* RT_USING_ZIGBEE_TI_GATEWAY */
 #endif /* RT_USING_ZIGBEE_TI*/
 #endif /* RT_USING_ZIGBEE */
@@ -130,21 +142,21 @@
 /* Reentrancy (thread safe) of the FatFs module.  */
 #define RT_DFS_ELM_REENTRANT
 /* Number of volumes (logical drives) to be used. */
-#define RT_DFS_ELM_DRIVES			2
+#define RT_DFS_ELM_DRIVES				2
 /* #define RT_DFS_ELM_USE_LFN			1 */
 #define RT_DFS_ELM_USE_LFN			    3
 /* #define RT_DFS_ELM_CODE_PAGE			936 */
 #define RT_DFS_ELM_CODE_PAGE			437
-#define RT_DFS_ELM_MAX_LFN			255
+#define RT_DFS_ELM_MAX_LFN				255
 /* Maximum sector size to be handled. */
-#define RT_DFS_ELM_MAX_SECTOR_SIZE  512
+#define RT_DFS_ELM_MAX_SECTOR_SIZE  	512
 
 #define DFS_USING_WORKDIR
 //#define DFS_USING_C_FILE_EXTEND
 /* the max number of mounted filesystem */
-#define DFS_FILESYSTEMS_MAX			2
+#define DFS_FILESYSTEMS_MAX				2
 /* the max number of opened files 		*/
-#define DFS_FD_MAX					4
+#define DFS_FD_MAX						4
 #endif /* RT_USING_DFS */
 
 /* SECTION: lwip, a lighwight TCP/IP protocol stack */
@@ -169,23 +181,23 @@
 #define RT_LWIP_DNS
 
 /* the number of simulatenously active TCP connections*/
-#define RT_LWIP_TCP_PCB_NUM	5
+#define RT_LWIP_TCP_PCB_NUM		5
 
 /* Using DHCP */
 /* #define RT_LWIP_DHCP */
 #define RT_LWIP_DHCP
 
 /* ip address of target*/
-#define RT_LWIP_IPADDR0	192
-#define RT_LWIP_IPADDR1	168
-#define RT_LWIP_IPADDR2	1
-#define RT_LWIP_IPADDR3	30
+#define RT_LWIP_IPADDR0		192
+#define RT_LWIP_IPADDR1		168
+#define RT_LWIP_IPADDR2		1
+#define RT_LWIP_IPADDR3		30
 
 /* gateway address of target*/
-#define RT_LWIP_GWADDR0	192
-#define RT_LWIP_GWADDR1	168
-#define RT_LWIP_GWADDR2	1
-#define RT_LWIP_GWADDR3	1
+#define RT_LWIP_GWADDR0		192
+#define RT_LWIP_GWADDR1		168
+#define RT_LWIP_GWADDR2		1
+#define RT_LWIP_GWADDR3		1
 
 /* mask address of target*/
 #define RT_LWIP_MSKADDR0	255
@@ -208,16 +220,16 @@
 #define RT_LWIP_ETHTHREAD_STACKSIZE		512
 
 /* TCP sender buffer space */
-#define RT_LWIP_TCP_SND_BUF	8192
+#define RT_LWIP_TCP_SND_BUF			8192
 /* TCP receive window. */
-#define RT_LWIP_TCP_WND		8192
+#define RT_LWIP_TCP_WND				8192
 #endif
 
 /* SECTION: RT-Thread/GUI */
 /* #define RT_USING_RTGUI */
 
 /* name length of RTGUI object */
-#define RTGUI_NAME_MAX		12
+#define RTGUI_NAME_MAX				12
 /* support 16 weight font */
 #define RTGUI_USING_FONT16
 /* support Chinese font */
@@ -233,7 +245,7 @@
 /* use mouse cursor */
 /* #define RTGUI_USING_MOUSE_CURSOR */
 /* default font size in RTGUI */
-#define RTGUI_DEFAULT_FONT_SIZE	16
+#define RTGUI_DEFAULT_FONT_SIZE		16
 
 /* image support */
 /* #define RTGUI_IMAGE_XPM */

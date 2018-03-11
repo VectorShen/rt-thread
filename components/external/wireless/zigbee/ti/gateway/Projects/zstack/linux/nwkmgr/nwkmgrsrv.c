@@ -42,9 +42,7 @@
 #include <signal.h>
 #include <unistd.h>
 
-#ifndef RTT_ZG_GATEWAY
 #include <getopt.h>
-#endif
 
 #include <ctype.h>
 #include <unistd.h>

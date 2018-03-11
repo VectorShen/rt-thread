@@ -48,11 +48,14 @@ extern "C" {
  *                                          Includes
  * ------------------------------------------------------------------------------------------------
  */
-
+#include <rtconfig.h>
 /* ------------------------------------------------------------------------------------------------
  *                                          Constants
  * ------------------------------------------------------------------------------------------------
  */
+#ifdef RTT_ZG_GATEWAY
+#define PTHREAD_STACK_MIN	256
+#endif
 
 #define API_LNX_CMD_ID_CTRL_TIME_PRINT_REQ			0x01
 #define API_LNX_CMD_ID_CTRL_BIG_DEBUG_PRINT_REQ		0x02

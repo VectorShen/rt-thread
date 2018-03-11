@@ -91,7 +91,7 @@ int processUint32Flag(const char * flagLong, const char * flagShort, uint32_t * 
 /**************************************************************************************************
  **************************************************************************************************/
 
-int ota_server_main( int argc, char *argv[] )
+int server_main( int argc, char *argv[] )
 {
 	int exitCode = 0;
 

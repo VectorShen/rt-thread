@@ -42,23 +42,25 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
-#ifndef RTT_ZG_GATEWAY
+
 #include <sys/select.h>
-#else
-#include <ipc/select.h>
-#endif
+
 #include <sys/time.h>
 #include <sys/types.h>
+
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 #include <sys/socket.h>
+#endif
+
 #include <sys/stat.h>
 #include <fcntl.h>
+
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 #include <netdb.h>
-   
-#ifndef RTT_ZG_GATEWAY
 #include <ifaddrs.h>
-#endif
-   
 #include <arpa/inet.h>
+#endif
+
 #include <pthread.h>
    
 #ifndef RTT_ZG_GATEWAY
@@ -136,13 +138,16 @@ static char strBuffer[128] = { 0 };
 
 static int apisErrorCode = 0;
 
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 static int listeningPort = 0;
 
 struct addrinfo hints;
 struct addrinfo *listenServerInfo;
+#endif
 
 char *toAPISLnxLog = NULL;
 
+#ifdef RT_USING_ZIGBEE_TI_GATEWAY_IPC_SOCKET
 fd_set activeConnectionsFDs;
 fd_set activeConnectionsFDsSafeCopy;
 int fdmax;
@@ -166,6 +171,7 @@ struct
   	int list[APIS_CONNECTION_QUEUE_SIZE];
   	int size;
 } activeConnections;
+#endif
 
 // Socket handles
 static uint32 listenSocketHndl;

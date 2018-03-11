@@ -63,6 +63,10 @@
 
 #ifdef RTT_ZG_GATEWAY
 #include <arch/lib.h>
+#include <libc/libc_signal.h>
+
+#undef printf
+#define printf  rt_kprintf
 #endif
  
 
@@ -78,12 +82,12 @@
 #endif
 
 #ifdef __BIG_DEBUG__
-#define debug_printf(fmt, ...) printf( fmt, ##__VA_ARGS__)
+#define debug_printf(fmt, ...) 	printf( fmt, ##__VA_ARGS__)
 #else
-#define debug_printf(fmt, ...) st (if (__BIG_DEBUG_ACTIVE == TRUE) printf( fmt, ##__VA_ARGS__);)
+#define debug_printf(fmt, ...) 	st (if (__BIG_DEBUG_ACTIVE == TRUE) printf( fmt, ##__VA_ARGS__);)
 #endif
 
-#define time_printf(fmt, ...) st (if ( (__BIG_DEBUG_ACTIVE == TRUE) && (__DEBUG_TIME_ACTIVE == TRUE)) printf( fmt, ##__VA_ARGS__);)
+#define time_printf(fmt, ...) 	st (if ( (__BIG_DEBUG_ACTIVE == TRUE) && (__DEBUG_TIME_ACTIVE == TRUE)) printf( fmt, ##__VA_ARGS__);)
 
 #if (defined __DEBUG_TIME__)
 struct timeval curTime, targetDelayTime;
@@ -223,7 +227,7 @@ static void *npi_rx_entry(void *ptr);
  *
  * input parameters
  *
- * @param      portName � name of the serial port
+ * @param      portName 锟� name of the serial port
  *
  * output parameters
  *

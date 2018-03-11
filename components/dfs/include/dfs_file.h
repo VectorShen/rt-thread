@@ -27,6 +27,7 @@
 
 #include <dfs.h>
 #include <dfs_fs.h>
+#include <rtconfig.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -66,6 +67,20 @@ struct dfs_fd
 
     void *data;                  /* Specific file system data */
 };
+
+#ifdef DFS_USING_C_FILE_EXTEND
+#define DFS_STDIN_FILE_NAME         "/stdin.txt"
+#define DFS_STDOUT_FILE_NAME        "/stdout.txt"
+#define DFS_STDERR_FILE_NAME        "/stderr.txt"
+
+extern struct dfs_fd* stdin ;
+extern struct dfs_fd* stdout;
+extern struct dfs_fd* stderr;
+
+#define stdin   stdin
+#define stdout  stdout
+#define stderr  stderr
+#endif
 
 int dfs_file_open(struct dfs_fd *fd, const char *path, int flags);
 int dfs_file_close(struct dfs_fd *fd);

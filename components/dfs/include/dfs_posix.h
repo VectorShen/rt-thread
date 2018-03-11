@@ -29,6 +29,7 @@
 #ifndef __DFS_POSIX_H__
 #define __DFS_POSIX_H__
 
+#include <rtconfig.h>
 #include <dfs_file.h>
 
 #ifdef __cplusplus
@@ -123,6 +124,25 @@ a+b  or ab+    append; open or create binary file for update, writing at end-of-
 #define C_FILE_O_BINARY_APPEND_FOR_RDWR_2                   "ab+"
 
 #define FPRINTF_MAX_BUFFER_SIZE         128
+
+#define EOF             (-1)
+
+#define SEEK_SET        0
+#define SEEK_CUR        1
+#define SEEK_END        2
+
+/*
+ * The following three definitions are for ANSI C, which took them
+ * from System V, which stupidly took internal interface macros and
+ * made them official arguments to setvbuf(), without renaming them.
+ * Hence, these ugly _IOxxx names are *supposed* to appear in user code.
+ *
+ * Although these happen to match their counterparts above, the
+ * implementation does not rely on that (so these could be renumbered).
+ */
+#define	_IOFBF	0		/* setvbuf should set fully buffered */
+#define	_IOLBF	1		/* setvbuf should set line buffered */
+#define	_IONBF	2		/* setvbuf should set unbuffered */
 #endif
 
 typedef struct
@@ -132,6 +152,10 @@ typedef struct
     int num;
     int cur;
 } DIR;
+
+#ifdef DFS_USING_C_FILE_EXTEND
+typedef struct dfs_fd FILE;
+#endif
 
 /* directory api*/
 int mkdir(const char *path, mode_t mode);
