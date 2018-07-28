@@ -62,6 +62,7 @@ rt_object_t rt_object_allocate(enum rt_object_class_type type,
                                const char               *name);
 void rt_object_delete(rt_object_t object);
 rt_bool_t rt_object_is_systemobject(rt_object_t object);
+rt_uint8_t rt_object_get_type(rt_object_t object);
 rt_object_t rt_object_find(const char *name, rt_uint8_t type);
 
 #ifdef RT_USING_HOOK
@@ -149,6 +150,7 @@ rt_err_t rt_thread_delete(rt_thread_t thread);
 
 rt_err_t rt_thread_yield(void);
 rt_err_t rt_thread_delay(rt_tick_t tick);
+rt_err_t rt_thread_mdelay(rt_int32_t ms);
 rt_err_t rt_thread_control(rt_thread_t thread, int cmd, void *arg);
 rt_err_t rt_thread_suspend(rt_thread_t thread);
 rt_err_t rt_thread_resume(rt_thread_t thread);
@@ -171,7 +173,8 @@ void rt_thread_inited_sethook (void (*hook)(rt_thread_t thread));
  */
 void rt_thread_idle_init(void);
 #if defined(RT_USING_HOOK) || defined(RT_USING_IDLE_HOOK)
-void rt_thread_idle_sethook(void (*hook)(void));
+rt_err_t rt_thread_idle_sethook(void (*hook)(void));
+rt_err_t rt_thread_idle_delhook(void (*hook)(void));
 #endif
 void rt_thread_idle_excute(void);
 rt_thread_t rt_thread_idle_gethandler(void);
@@ -204,6 +207,7 @@ void rt_scheduler_sethook(void (*hook)(rt_thread_t from, rt_thread_t to));
 void rt_signal_mask(int signo);
 void rt_signal_unmask(int signo);
 rt_sighandler_t rt_signal_install(int signo, rt_sighandler_t handler);
+int rt_signal_wait(const rt_sigset_t *set, rt_siginfo_t *si, rt_int32_t timeout);
 
 int rt_system_signal_init(void);
 #endif
@@ -545,6 +549,10 @@ rt_int32_t rt_strncmp(const char *cs, const char *ct, rt_ubase_t count);
 rt_int32_t rt_strcmp(const char *cs, const char *ct);
 rt_size_t rt_strlen(const char *src);
 char *rt_strdup(const char *s);
+#ifdef __CC_ARM
+/* leak strdup interface */
+char* strdup(const char* str);
+#endif
 
 char *rt_strstr(const char *str1, const char *str2);
 rt_int32_t rt_sscanf(const char *buf, const char *fmt, ...);
@@ -561,6 +569,10 @@ void rt_assert_set_hook(void (*hook)(const char *ex, const char *func, rt_size_t
 
 void rt_assert_handler(const char *ex, const char *func, rt_size_t line);
 #endif /* RT_DEBUG */
+
+#ifdef RT_USING_FINSH
+#include <finsh_api.h>
+#endif
 
 /**@}*/
 

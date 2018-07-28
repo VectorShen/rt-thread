@@ -275,6 +275,7 @@ rt_err_t rt_thread_startup(rt_thread_t thread)
     /* thread check */
     RT_ASSERT(thread != RT_NULL);
     RT_ASSERT((thread->stat & RT_THREAD_STAT_MASK) == RT_THREAD_INIT);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
 
     /* set current priority to init priority */
     thread->current_priority = thread->init_priority;
@@ -318,6 +319,8 @@ rt_err_t rt_thread_detach(rt_thread_t thread)
 
     /* thread check */
     RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
+    RT_ASSERT(rt_object_is_systemobject((rt_object_t)thread));
 
     if ((thread->stat & RT_THREAD_STAT_MASK) != RT_THREAD_INIT)
     {
@@ -416,6 +419,8 @@ rt_err_t rt_thread_delete(rt_thread_t thread)
 
     /* thread check */
     RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
+    RT_ASSERT(rt_object_is_systemobject((rt_object_t)thread) == RT_FALSE);
 
     if ((thread->stat & RT_THREAD_STAT_MASK) != RT_THREAD_INIT)
     {
@@ -504,6 +509,7 @@ rt_err_t rt_thread_sleep(rt_tick_t tick)
     /* set to current thread */
     thread = rt_current_thread;
     RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
 
     /* suspend thread */
     rt_thread_suspend(thread);
@@ -538,6 +544,23 @@ rt_err_t rt_thread_delay(rt_tick_t tick)
 RTM_EXPORT(rt_thread_delay);
 
 /**
+ * This function will let current thread delay for some milliseconds.
+ *
+ * @param tick the delay time
+ *
+ * @return RT_EOK
+ */
+rt_err_t rt_thread_mdelay(rt_int32_t ms)
+{
+    rt_tick_t tick;
+
+    tick = rt_tick_from_millisecond(ms);
+
+    return rt_thread_sleep(tick);
+}
+RTM_EXPORT(rt_thread_mdelay);
+
+/**
  * This function will control thread behaviors according to control command.
  *
  * @param thread the specified thread to be controlled
@@ -555,6 +578,7 @@ rt_err_t rt_thread_control(rt_thread_t thread, int cmd, void *arg)
 
     /* thread check */
     RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
 
     switch (cmd)
     {
@@ -633,12 +657,13 @@ rt_err_t rt_thread_suspend(rt_thread_t thread)
 
     /* thread check */
     RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
 
     RT_DEBUG_LOG(RT_DEBUG_THREAD, ("thread suspend:  %s\n", thread->name));
 
     if ((thread->stat & RT_THREAD_STAT_MASK) != RT_THREAD_READY)
     {
-        RT_DEBUG_LOG(RT_DEBUG_THREAD, ("thread suspend: thread disorder, %d\n",
+        RT_DEBUG_LOG(RT_DEBUG_THREAD, ("thread suspend: thread disorder, 0x%2x\n",
                                        thread->stat));
 
         return -RT_ERROR;
@@ -648,7 +673,7 @@ rt_err_t rt_thread_suspend(rt_thread_t thread)
     temp = rt_hw_interrupt_disable();
 
     /* change thread stat */
-    thread->stat = RT_THREAD_SUSPEND;
+    thread->stat = RT_THREAD_SUSPEND | (thread->stat & ~RT_THREAD_STAT_MASK);
     rt_schedule_remove_thread(thread);
 
     /* stop thread timer anyway */
@@ -675,6 +700,7 @@ rt_err_t rt_thread_resume(rt_thread_t thread)
 
     /* thread check */
     RT_ASSERT(thread != RT_NULL);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
 
     RT_DEBUG_LOG(RT_DEBUG_THREAD, ("thread resume:  %s\n", thread->name));
 
@@ -720,6 +746,7 @@ void rt_thread_timeout(void *parameter)
     /* thread check */
     RT_ASSERT(thread != RT_NULL);
     RT_ASSERT((thread->stat & RT_THREAD_STAT_MASK) == RT_THREAD_SUSPEND);
+    RT_ASSERT(rt_object_get_type((rt_object_t)thread) == RT_Object_Class_Thread);
 
     /* set error number */
     thread->error = -RT_ETIMEOUT;
